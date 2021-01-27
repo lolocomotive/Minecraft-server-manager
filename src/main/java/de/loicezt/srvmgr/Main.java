@@ -15,6 +15,7 @@ public class Main {
     public static String defaultConfiguration = "type: 0";
     public static int MASTER = 0;
     public static int WRAPPER = 1;
+    public static ConfigurationHolder config;
 
     public static void handleException(Exception e) {
         System.out.println("An error occurred!");
@@ -24,13 +25,13 @@ public class Main {
 
     public static void main(String[] args) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        File config = new File(configURL);
-        if (!config.exists()) {
+        File configFile = new File(configURL);
+        if (!configFile.exists()) {
             try {
                 System.out.println("First run detected - Welcome !");
                 System.out.println("Writing default config file");
-                config.createNewFile();
-                BufferedWriter writer = new BufferedWriter(new FileWriter(config));
+                configFile.createNewFile();
+                BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
                 writer.write(defaultConfiguration);
                 writer.flush();
                 writer.close();
@@ -39,10 +40,10 @@ public class Main {
             }
         }
         try {
-            int type = mapper.readValue(config, ConfigurationHolder.class).getType();
-            if(type == WRAPPER){
+            config = mapper.readValue(configFile, ConfigurationHolder.class);
+            if (config.getType() == WRAPPER) {
                 new Wrapper();
-            }else if(type == MASTER){
+            } else if (config.getType() == MASTER) {
                 new Master();
             }
 
