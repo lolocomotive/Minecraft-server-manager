@@ -1,0 +1,13 @@
+type: 0
+serverID: servers/test
+jarfile: ./target/mcsrvmgr-1.0-SNAPSHOT-jar-with-dependencies.jar
+servers:
+  - serverID: lobby
+    path: servers/lobby
+    type: FIXED
+  - serverID: srv01
+    path: servers/srv01
+    type: MODULAR
+  - serverID: survival
+    path: servers/survival
+    type: FIXED

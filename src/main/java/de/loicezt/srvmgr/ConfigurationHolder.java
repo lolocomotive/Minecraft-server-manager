@@ -5,7 +5,25 @@ import java.util.List;
 
 public class ConfigurationHolder {
     private int type;
+    private String jarfile;
     private List<WrapperInstance> servers = new ArrayList<>();
+    private String serverID;
+
+    public String getServerID() {
+        return serverID;
+    }
+
+    public void setServerID(String serverID) {
+        this.serverID = serverID;
+    }
+
+    public String getJarfile() {
+        return jarfile;
+    }
+
+    public void setJarfile(String jarfile) {
+        this.jarfile = jarfile;
+    }
 
     public List<WrapperInstance> getServers() {
         return servers;
@@ -14,7 +32,6 @@ public class ConfigurationHolder {
     public void setServers(List<WrapperInstance> servers) {
         this.servers = servers;
     }
-
 
     public int getType() {
         return type;

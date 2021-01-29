@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: de.loicezt.srvmgr.Main
+Class-Path: jackson-annotations-2.11.1.jar jackson-core-2.11.1.jar jackson-databind-2.11.1.jar jackson-dataformat-yaml-2.11.1.jar jackson-datatype-jsr310-2.11.1.jar org.eclipse.paho.client.mqttv3-1.2.0.jar snakeyaml-1.26.jar
+
