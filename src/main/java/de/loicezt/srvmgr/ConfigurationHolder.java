@@ -3,6 +3,9 @@ package de.loicezt.srvmgr;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The class that holds all of the configuration information read at the beginning of the Main class
+ */
 public class ConfigurationHolder {
     private int type;
     private String java;

@@ -1,13 +1,14 @@
 package de.loicezt.srvmgr;
 
 import de.loicezt.srvmgr.master.Master;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
+/**
+ * The class that allows communication between the master node and the wrapper nodes
+ */
 public class WrapperInstance {
 
     private String path;
@@ -68,6 +69,12 @@ public class WrapperInstance {
         this.status = status;
     }
 
+    /**
+     * Copy a file
+     * @param from The source file
+     * @param to The destination File
+     * @throws IOException
+     */
     public static void copyFile(File from, File to)
             throws IOException {
         try (
@@ -85,6 +92,9 @@ public class WrapperInstance {
         }
     }
 
+    /**
+     * Starts the wrapper associated with this instance
+     */
     public void startWrapper() {
         try {
             File dir = new File("./" + path);
@@ -152,9 +162,13 @@ public class WrapperInstance {
         }
     }
 
-    public void stop(IMqttClient client) {
+    /**
+     * Stops the wrapper associated with this instance
+     * @param client The MqttClient which should be used for sending instructions
+     */
+    public void stop(MqttClient client) {
         try {
-            client.publish(path, new MqttMessage("stop wrapper".getBytes(StandardCharsets.UTF_8)));
+            Main.mqttMsgSend(path, "stop wrapper", client);
             Master.log("Waiting for wrapper " + path + " to stop");
             while (process.isAlive()) {
             }

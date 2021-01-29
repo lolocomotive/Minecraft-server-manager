@@ -5,10 +5,14 @@ import org.eclipse.paho.client.mqttv3.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * The Wrapper class is instantiated when the node doesn't start as a master node
+ */
 public class Wrapper {
+    /**
+     * The constructor Connects to the localhost MQTT server and sets itself up to listen for instructions
+     */
     public Wrapper() {
         System.out.println("Starting up as WRAPPER node");
         String publisherId = UUID.randomUUID().toString();
@@ -20,27 +24,28 @@ public class Wrapper {
             options.setConnectionTimeout(10);
             client.connect(options);
             client.publish("log", new MqttMessage(("Wrapper node " + Main.config.getServerID() + " started").getBytes(StandardCharsets.UTF_8)));
-            CountDownLatch receivedSignal = new CountDownLatch(10);
+            //CountDownLatch receivedSignal = new CountDownLatch(10);
             client.subscribe(Main.config.getServerID(), (topic, msg) -> {
                 String payload = new String(msg.getPayload(), StandardCharsets.UTF_8);
-                receivedSignal.countDown();
+                //receivedSignal.countDown();
                 switch (payload) {
                     case "stop wrapper":
                         System.out.println("Stopping wrapper !");
-                        client.publish(Main.config.getServerID(),new MqttMessage("wrapper stopping".getBytes(StandardCharsets.UTF_8)));
-                        client.disconnectForcibly(0);
+                        client.publish(Main.config.getServerID(), new MqttMessage("wrapper stopping".getBytes(StandardCharsets.UTF_8)));
+                        client.disconnectForcibly(1);
                         System.exit(0);
                         break;
                     default:
                         System.out.println("Unrecognized instruction \"" + payload + "\"");
                 }
             });
-            receivedSignal.await(1, TimeUnit.MINUTES);
+            //receivedSignal.await(1, TimeUnit.MINUTES);
+            client.publish(Main.config.getServerID(), new MqttMessage("wrapper online".getBytes(StandardCharsets.UTF_8)));
         } catch (MqttException e) {
             Main.handleException(e);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        } //catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 }

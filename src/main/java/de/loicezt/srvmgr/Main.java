@@ -21,19 +21,36 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static de.loicezt.srvmgr.master.Master.logErr;
+
+/**
+ * The main class
+ */
 public class Main {
     /**
      * The location of the configuration file
      */
     public static String configURL = "./config.yml";
+    /**
+     * The default configuration to write in an empty file when the configuration file does not exist
+     */
     public static String defaultConfiguration = "type: 0";
     public static int MASTER = 0;
     public static int WRAPPER = 1;
+    /**
+     * The configuration of the program
+     * @see ConfigurationHolder The configuration holder class
+     */
     public static ConfigurationHolder config;
 
+
+    /**
+     * Method to call when an exception is thrown
+     * @param e The exception that occurred
+     */
     public static void handleException(Exception e) {
-        System.out.println("An error occurred!");
-        System.out.println(e.getLocalizedMessage());
+        logErr("An error occurred!");
+        logErr(e.getLocalizedMessage());
         System.exit(1);
     }
 
@@ -121,6 +138,10 @@ public class Main {
         }
     }
 
+    /**
+     * Removes all the files in the array, called at the start and end of program to clean up stuff
+     * @param garbage files to be removed
+     */
     public static void cleanup(File[] garbage) {
         for (File file : garbage) {
             try {
@@ -135,6 +156,10 @@ public class Main {
         }
     }
 
+    /**
+     * Get the temporary garbage files that should be deleted and are no longer required
+     * @return The temporary garbage files that should be deleted and are no longer required
+     */
     public static File[] getGarbage() {
         File[] files = new File(".").listFiles();
         List<File> r = new ArrayList<>();
@@ -150,6 +175,12 @@ public class Main {
         return re;
     }
 
+    /**
+     * Deletes a directory
+     * @param dir The directory to be deleted
+     * @return Wether the deletion was successful
+     * @throws IOException
+     */
     public static boolean deleteDirectory(Path dir) throws IOException {
         Files.walk(dir)
                 .sorted(Comparator.reverseOrder())
