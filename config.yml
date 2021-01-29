@@ -1,6 +1,7 @@
 type: 0
 serverID: servers/test
 jarfile: ./target/mcsrvmgr-1.0-SNAPSHOT-jar-with-dependencies.jar
+java: java
 servers:
   - serverID: lobby
     path: servers/lobby

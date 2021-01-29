@@ -5,9 +5,18 @@ import java.util.List;
 
 public class ConfigurationHolder {
     private int type;
+    private String java;
     private String jarfile;
     private List<WrapperInstance> servers = new ArrayList<>();
     private String serverID;
+
+    public String getJava() {
+        return java;
+    }
+
+    public void setJava(String java) {
+        this.java = java;
+    }
 
     public String getServerID() {
         return serverID;
