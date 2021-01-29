@@ -99,7 +99,7 @@ public class WrapperInstance {
                     BufferedWriter writer = new BufferedWriter(new FileWriter(startupScript));
                     String startScript = "#!/bin/sh\n" +
                             "cd ./" + path + "\n" +
-                            "java -jar wrapper.jar #>> log.txt";
+                            Main.config.getJava() + " -jar wrapper.jar #>> log.txt";
                     writer.write(startScript);
                     writer.flush();
                     writer.close();
