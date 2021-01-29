@@ -4,11 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.loicezt.srvmgr.master.Master;
 import de.loicezt.srvmgr.wrapper.Wrapper;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -16,6 +22,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Main {
+    /**
+     * The location of the configuration file
+     */
     public static String configURL = "./config.yml";
     public static String defaultConfiguration = "type: 0";
     public static int MASTER = 0;
@@ -28,7 +37,57 @@ public class Main {
         System.exit(1);
     }
 
+    /**
+     * Method to easily send a Message on the desired topic
+     * @param topic The MQTT topic
+     * @param message The message to send
+     * @param client The MQTT client
+     * @throws MqttException
+     */
+    public static void mqttMsgSend(String topic, String message, MqttClient client) throws MqttException {
+        MqttMessage m = new MqttMessage(message.getBytes(StandardCharsets.UTF_8));
+        m.setQos(2);
+        client.publish(topic, m);
+    }
+
+    /**
+     * @param args the command line arguments
+     * Main method called at the start of the program
+     */
     public static void main(String[] args) {
+
+
+        String topic = "MQTT Examples";
+        String content = "Message from MqttPublishSample";
+        int qos = 2;
+        String broker = "tcp://localhost:1883";
+        String clientId = "JavaSample";
+        MemoryPersistence persistence = new MemoryPersistence();
+
+        try {
+            MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+            System.out.println("Connecting to broker: " + broker);
+            sampleClient.connect(connOpts);
+            System.out.println("Connected");
+            System.out.println("Publishing message: " + content);
+            MqttMessage message = new MqttMessage(content.getBytes());
+            message.setQos(qos);
+            sampleClient.publish(topic, message);
+            System.out.println("Message published");
+            sampleClient.disconnect();
+            System.out.println("Disconnected");
+        } catch (MqttException me) {
+            System.out.println("reason " + me.getReasonCode());
+            System.out.println("msg " + me.getMessage());
+            System.out.println("loc " + me.getLocalizedMessage());
+            System.out.println("cause " + me.getCause());
+            System.out.println("excep " + me);
+            me.printStackTrace();
+        }
+
+
         File[] garbage = getGarbage();
         if (garbage.length > 0) {
             System.out.println("Cleaning up previous session");
