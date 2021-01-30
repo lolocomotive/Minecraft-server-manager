@@ -71,8 +71,9 @@ public class WrapperInstance {
 
     /**
      * Copy a file
+     *
      * @param from The source file
-     * @param to The destination File
+     * @param to   The destination File
      * @throws IOException
      */
     public static void copyFile(File from, File to)
@@ -142,18 +143,19 @@ public class WrapperInstance {
                             InputStreamReader(process.getInputStream()));
                     BufferedReader stdError = new BufferedReader(new
                             InputStreamReader(process.getErrorStream()));
-                    String s;
-                    while (process.isAlive()) {
-                        if (((s = stdInput.readLine()) != null))
-                            Master.log(s, path);
-                        if (((s = stdError.readLine()) != null))
-                            Master.logErr(s, path);
+                    String in = null, err = null;
+                    while (process.isAlive() || ((in = stdInput.readLine()) != null) || ((err = stdError.readLine()) != null)) {
+                        if (in != null)
+                            Master.log(in, path);
+                        if (err != null)
+                            Master.logErr(err, path);
                     }
                     stdInput.close();
                     stdError.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                Master.log("Logging terminated", path);
             });
             logger.start();
         } catch (IOException ex) {
@@ -164,6 +166,7 @@ public class WrapperInstance {
 
     /**
      * Stops the wrapper associated with this instance
+     *
      * @param client The MqttClient which should be used for sending instructions
      */
     public void stop(MqttClient client) {
@@ -172,6 +175,7 @@ public class WrapperInstance {
             Master.log("Waiting for wrapper " + path + " to stop");
             while (process.isAlive()) {
             }
+            client.unsubscribe(path);
         } catch (MqttException e) {
             e.printStackTrace();
         }

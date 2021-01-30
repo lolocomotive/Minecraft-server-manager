@@ -39,6 +39,7 @@ public class Main {
     public static int WRAPPER = 1;
     /**
      * The configuration of the program
+     *
      * @see ConfigurationHolder The configuration holder class
      */
     public static ConfigurationHolder config;
@@ -46,6 +47,7 @@ public class Main {
 
     /**
      * Method to call when an exception is thrown
+     *
      * @param e The exception that occurred
      */
     public static void handleException(Exception e) {
@@ -56,9 +58,10 @@ public class Main {
 
     /**
      * Method to easily send a Message on the desired topic
-     * @param topic The MQTT topic
+     *
+     * @param topic   The MQTT topic
      * @param message The message to send
-     * @param client The MQTT client
+     * @param client  The MQTT client
      * @throws MqttException
      */
     public static void mqttMsgSend(String topic, String message, MqttClient client) throws MqttException {
@@ -69,41 +72,9 @@ public class Main {
 
     /**
      * @param args the command line arguments
-     * Main method called at the start of the program
+     *             Main method called at the start of the program
      */
     public static void main(String[] args) {
-
-
-        String topic = "MQTT Examples";
-        String content = "Message from MqttPublishSample";
-        int qos = 2;
-        String broker = "tcp://localhost:1883";
-        String clientId = "JavaSample";
-        MemoryPersistence persistence = new MemoryPersistence();
-
-        try {
-            MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
-            MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
-            System.out.println("Connecting to broker: " + broker);
-            sampleClient.connect(connOpts);
-            System.out.println("Connected");
-            System.out.println("Publishing message: " + content);
-            MqttMessage message = new MqttMessage(content.getBytes());
-            message.setQos(qos);
-            sampleClient.publish(topic, message);
-            System.out.println("Message published");
-            sampleClient.disconnect();
-            System.out.println("Disconnected");
-        } catch (MqttException me) {
-            System.out.println("reason " + me.getReasonCode());
-            System.out.println("msg " + me.getMessage());
-            System.out.println("loc " + me.getLocalizedMessage());
-            System.out.println("cause " + me.getCause());
-            System.out.println("excep " + me);
-            me.printStackTrace();
-        }
-
 
         File[] garbage = getGarbage();
         if (garbage.length > 0) {
@@ -140,6 +111,7 @@ public class Main {
 
     /**
      * Removes all the files in the array, called at the start and end of program to clean up stuff
+     *
      * @param garbage files to be removed
      */
     public static void cleanup(File[] garbage) {
@@ -158,6 +130,7 @@ public class Main {
 
     /**
      * Get the temporary garbage files that should be deleted and are no longer required
+     *
      * @return The temporary garbage files that should be deleted and are no longer required
      */
     public static File[] getGarbage() {
@@ -177,8 +150,9 @@ public class Main {
 
     /**
      * Deletes a directory
+     *
      * @param dir The directory to be deleted
-     * @return Wether the deletion was successful
+     * @return Whether the deletion was successful or not
      * @throws IOException
      */
     public static boolean deleteDirectory(Path dir) throws IOException {
