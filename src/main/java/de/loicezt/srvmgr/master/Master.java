@@ -15,7 +15,7 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * The class that is instantiated if the running node is a master node. It will start up all of the child nodes
+ * The class that is instantiated if the running node is a master node. It will start up all of the child (aka {@link de.loicezt.srvmgr.wrapper.Wrapper Wrapper}) nodes
  */
 public class Master {
     boolean stop = false;
@@ -65,7 +65,7 @@ public class Master {
 
     /**
      * The constructor
-     * Connects to the localhost MQTT server and starts all of the children
+     * Connects to the localhost MQTT server and starts all of the children (Which will then start up as {@link de.loicezt.srvmgr.wrapper.Wrapper Wrappers})
      */
     public Master() {
         log("Starting up as MASTER node");
