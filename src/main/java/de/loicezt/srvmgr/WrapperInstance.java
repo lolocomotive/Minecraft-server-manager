@@ -1,13 +1,14 @@
 package de.loicezt.srvmgr;
 
 import de.loicezt.srvmgr.master.Master;
+import de.loicezt.srvmgr.wrapper.Wrapper;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.*;
 
 /**
- * The class that allows communication between the master node and the wrapper nodes
+ * The class that allows communication between the {@link Master Master} and {@link Wrapper Wrapper} nodes
  */
 public class WrapperInstance {
 
