@@ -9,9 +9,6 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -51,7 +48,7 @@ public class Master {
                             new Thread(() -> {
                                 log("Stopping children...");
                                 for (WrapperInstance wi : Main.config.getServers()) {
-                                        wi.stop(client);
+                                    wi.stop(client);
                                 }
                                 log("Unsubscribing...");
                                 try {
