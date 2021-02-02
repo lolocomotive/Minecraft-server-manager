@@ -22,48 +22,6 @@ public class Master {
     MqttClient client;
 
     /**
-     * Custom logging solution, prints a message with the current timestamp
-     *
-     * @param message The message you want to log
-     */
-    public static void log(String message) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println("[" + timestamp + "]\t[INFO]\t[master]:\t" + message);
-    }
-
-    /**
-     * Custom logging solution, prints a message with the current timestamp and origin
-     *
-     * @param message The message you want to log
-     * @param user    The origin of the message
-     */
-    public static void log(String message, String user) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println("[" + timestamp + "]\t[INFO]\t[" + user + "]:\t" + message);
-    }
-
-    /**
-     * Custom logging solution, prints an error message on System.err with the current timestamp
-     *
-     * @param message The error message you want to log
-     */
-    public static void logErr(String message) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.err.println("[" + timestamp + "]\t[ERROR]\t[master]:\t" + message);
-    }
-
-    /**
-     * Custom logging solution, prints an error message on System.err with the current timestamp and origin
-     *
-     * @param message The message you want to log
-     * @param user    The origin of the message
-     */
-    public static void logErr(String message, String user) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.err.println("[" + timestamp + "]\t[ERROR]\t[" + user + "]:\t" + message);
-    }
-
-    /**
      * The constructor
      * Connects to the localhost MQTT server and starts all of the children (Which will then start up as {@link de.loicezt.srvmgr.wrapper.Wrapper Wrappers})
      */
@@ -127,5 +85,47 @@ public class Master {
                 MqttException e) {
             Main.handleException(e);
         }
+    }
+
+    /**
+     * Custom logging solution, prints a message with the current timestamp
+     *
+     * @param message The message you want to log
+     */
+    public static void log(String message) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println("[" + timestamp + "]\t[INFO]\t[master]:\t" + message);
+    }
+
+    /**
+     * Custom logging solution, prints a message with the current timestamp and origin
+     *
+     * @param message The message you want to log
+     * @param user    The origin of the message
+     */
+    public static void log(String message, String user) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println("[" + timestamp + "]\t[INFO]\t[" + user + "]:\t" + message);
+    }
+
+    /**
+     * Custom logging solution, prints an error message on System.err with the current timestamp
+     *
+     * @param message The error message you want to log
+     */
+    public static void logErr(String message) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.err.println("[" + timestamp + "]\t[ERROR]\t[master]:\t" + message);
+    }
+
+    /**
+     * Custom logging solution, prints an error message on System.err with the current timestamp and origin
+     *
+     * @param message The message you want to log
+     * @param user    The origin of the message
+     */
+    public static void logErr(String message, String user) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.err.println("[" + timestamp + "]\t[ERROR]\t[" + user + "]:\t" + message);
     }
 }
