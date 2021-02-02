@@ -5,16 +5,11 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * The Wrapper class is instantiated when the node doesn't start as a {@link de.loicezt.srvmgr.master.Master Master} node
  */
 public class Wrapper {
-    public boolean stop = false;
-
     /**
      * The constructor Connects to the localhost MQTT server and sets itself up to listen for instructions
      */
