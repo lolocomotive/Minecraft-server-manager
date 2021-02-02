@@ -71,8 +71,10 @@ public class Main {
     }
 
     /**
+     * Main method called at the start of the program
+     *
      * @param args the command line arguments
-     *             Main method called at the start of the program
+     *             <p>It will instantiate a {@link Wrapper} or {@link Master} class depending on the configuration (0 = Master, 1 = Wrapper)</p>
      */
     public static void main(String[] args) {
 
