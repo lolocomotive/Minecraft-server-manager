@@ -10,7 +10,7 @@ import java.util.UUID;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * The Wrapper class is instantiated when the node doesn't start as a master node
+ * The Wrapper class is instantiated when the node doesn't start as a {@link de.loicezt.srvmgr.master.Master Master} node
  */
 public class Wrapper {
     public boolean stop = false;
