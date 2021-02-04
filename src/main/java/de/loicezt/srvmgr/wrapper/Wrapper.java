@@ -1,24 +1,47 @@
 package de.loicezt.srvmgr.wrapper;
 
-import de.loicezt.srvmgr.Main;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import de.loicezt.srvmgr.ExtensionMethods;
+import de.loicezt.srvmgr.ServerType;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+
 
 /**
  * The Wrapper class is instantiated when the node doesn't start as a {@link de.loicezt.srvmgr.master.Master Master} node
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class Wrapper {
+    private static final String wrapperConfigFile = "./wrapper.yml";
+    private WrapperConfigurationHolder config;
+
     /**
-     * The constructor Connects to the localhost MQTT server and sets itself up to listen for instructions
+     * The constructor <p>Connects to the localhost MQTT server and sets itself up to listen for instructions</p>
      */
     public Wrapper() {
         System.out.println("Starting up as WRAPPER node");
         try {
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            config = mapper.readValue(new File(wrapperConfigFile), WrapperConfigurationHolder.class);
+        } catch (JsonProcessingException e) {
+            System.err.println("Something went wrong while reading the configuration file, stopping immediately");
+            e.printStackTrace();
+            System.exit(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
             IMqttClient client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId(), new MemoryPersistence());
             client.connect();
-            client.publish("log", new MqttMessage(("Wrapper node " + Main.config.getServerID() + " started").getBytes(StandardCharsets.UTF_8)));
+            client.publish("log", new MqttMessage(("Wrapper node " + config.getServerID() + " started").getBytes(StandardCharsets.UTF_8)));
             client.setCallback(new MqttCallback() {
                 @Override
                 public void connectionLost(Throwable cause) { //Called when the client lost the connection to the broker
@@ -26,29 +49,101 @@ public class Wrapper {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
+                    System.out.println("stonks" + topic + new String(message.getPayload(), StandardCharsets.UTF_8));
                     String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
-                    //receivedSignal.countDown();
-                    switch (payload) {
-                        case "stop wrapper":
-                            new Thread(() -> {
-                                System.out.println("Stopping wrapper !");
-                                try {
-                                    client.publish(Main.config.getServerID(), new MqttMessage("wrapper stopping".getBytes(StandardCharsets.UTF_8)));
-                                    System.out.println("Unsubscribing from topic");
-                                    client.unsubscribe(Main.config.getServerID());
-                                    System.out.println("Disconnecting Mqtt client");
-                                    client.disconnect();
-                                    System.out.println("Closing connection");
-                                    client.close();
-                                    System.out.println("Connection closed");
-                                    System.exit(0);
-                                } catch (MqttException e) {
-                                    e.printStackTrace();
+                    String[] args = payload.split(" ");
+                    switch (args[0]) {
+                        case "stop":
+                            if (args[1].equals("wrapper")) {
+                                new Thread(() -> {
+                                    System.out.println("Stopping wrapper !");
+                                    try {
+                                        client.publish(config.getServerID(), new MqttMessage("wrapper stopping".getBytes(StandardCharsets.UTF_8)));
+                                        System.out.println("Unsubscribing from topic");
+                                        client.unsubscribe(config.getServerID());
+                                        System.out.println("Disconnecting Mqtt client");
+                                        client.disconnect();
+                                        System.out.println("Closing connection");
+                                        client.close();
+                                        System.out.println("Connection closed");
+                                        System.exit(0);
+                                    } catch (MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }).start();
+                            }
+                            break;
+                        case "start":
+                            if (args[1].equals("server")) {
+                                if (config.getServerType() == ServerType.FIXED) {
+                                    Runtime.getRuntime().exec("./" + config.getServerID() + "/start.sh");
+                                } else if (config.getServerType() == ServerType.MINIGAME) {
+                                    System.out.println("Preparing server...");
+                                    new File("server/mods").mkdirs();
+                                    new File("server/plugins").mkdirs();
+                                    File srvDir = new File(".");
+                                    try {
+                                        System.out.println("Copying plugins...");
+                                        for (String url : config.getPlugins()) {
+                                            File f = new File(url);
+                                            System.out.println(f.getName());
+                                            ExtensionMethods.copyFile(f, new File("server/plugins/" + f.getName()));
+                                        }
+                                    } catch (NullPointerException e) {
+                                        System.out.println("Didn't find any plugin to copy");
+                                    }
+                                    try {
+                                        System.out.println("Copying mods...");
+
+                                        for (String url : config.getMods()) {
+                                            File f = new File(url);
+                                            System.out.println(f.getName());
+                                            ExtensionMethods.copyFile(f, new File("server/mods/" + f.getName()));
+                                        }
+                                    } catch (NullPointerException e) {
+                                        System.out.println("Didn't find any mods to copy");
+                                    }
+                                    try {
+                                        System.out.println("Copying Additional server files...");
+
+                                        for (String url : config.getAdditionalFiles()) {
+                                            File f = new File(url);
+                                            System.out.println(f.getName());
+                                            ExtensionMethods.copyFile(f, new File("server/" + f.getName()));
+                                        }
+                                    } catch (NullPointerException e) {
+                                        System.out.println("Didn't find any additional files to copy");
+                                    }
+                                    ExtensionMethods.copyFile(new File(config.getServerJar()), new File("server/server.jar"));
+                                    System.out.println("starting server...");
+                                    Process p = Runtime.getRuntime().exec("./server/start.sh");
+                                    System.out.println("Started");
+                                    Thread logger = new Thread(() -> {
+                                        try {
+                                            System.out.println("Initializing server logging");
+                                            BufferedReader stdInput = new BufferedReader(new
+                                                    InputStreamReader(p.getInputStream()));
+                                            BufferedReader stdError = new BufferedReader(new
+                                                    InputStreamReader(p.getErrorStream()));
+                                            String in = null, err = null;
+                                            while (p.isAlive() || ((in = stdInput.readLine()) != null) || ((err = stdError.readLine()) != null)) {
+                                                if (in != null)
+                                                    System.out.println("[server]: " + in);
+                                                if (err != null)
+                                                    System.err.println("[server]: " + err);
+                                            }
+                                            stdInput.close();
+                                            stdError.close();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        System.out.println("Server logging terminated");
+                                    });
+                                    logger.start();
                                 }
-                            }).start();
+                            }
                             break;
                         default:
-
                     }
                 }
 
@@ -56,14 +151,12 @@ public class Wrapper {
                 public void deliveryComplete(IMqttDeliveryToken token) {//Called when a outgoing publish is complete
                 }
             });
-            client.subscribe(Main.config.getServerID(), 1);
-            client.publish(Main.config.getServerID(), new
+            client.subscribe(config.getServerID(), 1);
+            client.publish(config.getServerID(), new
                     MqttMessage("wrapper online".getBytes(StandardCharsets.UTF_8)));
         } catch (MqttException e) {
-            Main.handleException(e);
-        } //catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
+            ExtensionMethods.handleException(e);
+        }
+        System.out.println("Running!");
     }
 }

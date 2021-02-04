@@ -1,14 +1,21 @@
+---
 type: 0
-serverID: servers/test
 jarfile: ./target/mcsrvmgr-1.0-SNAPSHOT-jar-with-dependencies.jar
 java: java
 servers:
-  - serverID: lobby
-    path: servers/lobby
-    type: FIXED
-  - serverID: srv01
-    path: servers/srv01
-    type: MODULAR
-  - serverID: survival
-    path: servers/survival
+  - path: servers/lobby
+    type: MINIGAME
+    wConfig:
+      serverType: MINIGAME
+      mods:
+      worlds:
+      additionalFiles:
+        - /home/stonksic/Downloads/eula.txt
+        - /home/stonksic/Downloads/start.sh
+      serverJar: /home/stonksic/Downloads/spigot-1.16.5.jar
+      plugins:
+      serverID: servers/lobby
+  - path: servers/srv01
+    type: MINIGAME
+  - path: servers/survival
     type: FIXED

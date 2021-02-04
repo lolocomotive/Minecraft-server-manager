@@ -11,7 +11,7 @@ public class ConfigurationHolder {
     private String java;
     private String jarfile;
     private List<WrapperInstance> servers = new ArrayList<>();
-    private String serverID;
+
 
     public String getJava() {
         return java;
@@ -19,14 +19,6 @@ public class ConfigurationHolder {
 
     public void setJava(String java) {
         this.java = java;
-    }
-
-    public String getServerID() {
-        return serverID;
-    }
-
-    public void setServerID(String serverID) {
-        this.serverID = serverID;
     }
 
     public String getJarfile() {
@@ -52,4 +44,5 @@ public class ConfigurationHolder {
     public void setType(int type) {
         this.type = type;
     }
+
 }

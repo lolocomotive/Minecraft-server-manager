@@ -1,5 +1,6 @@
 package de.loicezt.srvmgr.master;
 
+import de.loicezt.srvmgr.ExtensionMethods;
 import de.loicezt.srvmgr.Main;
 import de.loicezt.srvmgr.WrapperInstance;
 import org.eclipse.paho.client.mqttv3.*;
@@ -28,7 +29,7 @@ public class Master {
         try {
             MqttClient client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId(), new MemoryPersistence());
             client.connect();
-            Main.mqttMsgSend("log", "Master node started", client);
+            ExtensionMethods.mqttMsgSend("log", "Master node started", client);
             for (WrapperInstance instance : Main.config.getServers()) {
                 instance.startWrapper();
             }
@@ -60,10 +61,10 @@ public class Master {
                                 } catch (MqttException e) {
                                     e.printStackTrace();
                                 }
-                                File[] garbage = Main.getGarbage();
+                                File[] garbage = ExtensionMethods.getGarbage();
                                 if (garbage.length > 0) {
                                     log("Cleaning up leftover garbage");
-                                    Main.cleanup(garbage);
+                                    ExtensionMethods.cleanup(garbage);
                                 }
                                 log("Good bye !");
                             }).start();
@@ -80,7 +81,7 @@ public class Master {
             client.subscribe("master", 1);
         } catch (
                 MqttException e) {
-            Main.handleException(e);
+            ExtensionMethods.handleException(e);
         }
     }
 

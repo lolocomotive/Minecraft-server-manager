@@ -1,7 +1,10 @@
 package de.loicezt.srvmgr;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.loicezt.srvmgr.master.Master;
 import de.loicezt.srvmgr.wrapper.Wrapper;
+import de.loicezt.srvmgr.wrapper.WrapperConfigurationHolder;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -13,12 +16,28 @@ import java.io.*;
 public class WrapperInstance {
 
     private String path;
-    private String serverID;
     private Status status;
     private Status srvStatus;
     private Process process;
-    private long timeout = 1000;
     private Thread logger;
+    private ServerType type;
+    private WrapperConfigurationHolder wConfig;
+
+    public Thread getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Thread logger) {
+        this.logger = logger;
+    }
+
+    public WrapperConfigurationHolder getwConfig() {
+        return wConfig;
+    }
+
+    public void setwConfig(WrapperConfigurationHolder wConfig) {
+        this.wConfig = wConfig;
+    }
 
     public Process getProcess() {
         return process;
@@ -36,21 +55,11 @@ public class WrapperInstance {
         this.path = path;
     }
 
-    public String getServerID() {
-        return serverID;
-    }
-
-    public void setServerID(String serverID) {
-        this.serverID = serverID;
-    }
-
-    private Types type;
-
-    public Types getType() {
+    public ServerType getType() {
         return type;
     }
 
-    public void setType(Types type) {
+    public void setType(ServerType type) {
         this.type = type;
     }
 
@@ -71,70 +80,64 @@ public class WrapperInstance {
     }
 
     /**
-     * Copy a file
-     *
-     * @param from The source file
-     * @param to   The destination File
-     * @throws IOException
-     */
-    public static void copyFile(File from, File to)
-            throws IOException {
-        try (
-                InputStream in = new BufferedInputStream(
-                        new FileInputStream(from));
-                OutputStream out = new BufferedOutputStream(
-                        new FileOutputStream(to))) {
-
-            byte[] buffer = new byte[1024];
-            int lengthRead;
-            while ((lengthRead = in.read(buffer)) > 0) {
-                out.write(buffer, 0, lengthRead);
-                out.flush();
-            }
-        }
-    }
-
-    /**
      * Starts the wrapper associated with this instance
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void startWrapper() {
         try {
             File dir = new File("./" + path);
             dir.mkdirs();
             File thisJar = new File("./" + Main.config.getJarfile());
-            copyFile(thisJar, new File(dir.getAbsolutePath() + "/wrapper.jar"));
+            ExtensionMethods.copyFile(thisJar, new File(dir.getAbsolutePath() + "/wrapper.jar"));
             File startupScript = new File(dir.getAbsolutePath() + "/start.sh");
-            if (!startupScript.exists()) {
-                try {
-                    Master.log("Writing default startup script for wrapper " + path);
-                    startupScript.createNewFile();
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(startupScript));
-                    String startScript = "#!/bin/sh\n" +
-                            "cd ./" + path + "\n" +
-                            Main.config.getJava() + " -jar wrapper.jar #>> log.txt";
-                    writer.write(startScript);
-                    writer.flush();
-                    writer.close();
-                    startupScript.setExecutable(true);
-                } catch (IOException e) {
-                    Main.handleException(e);
-                }
+            try {
+                Master.log("Writing default startup script for wrapper " + path);
+                startupScript.createNewFile();
+                BufferedWriter writer = new BufferedWriter(new FileWriter(startupScript));
+                String startScript = "#!/bin/sh\n" +
+                        "cd ./" + path + "\n" +
+                        Main.config.getJava() + " -jar wrapper.jar #>> log.txt";
+                writer.write(startScript);
+                writer.flush();
+                writer.close();
+                startupScript.setExecutable(true);
+            } catch (IOException e) {
+                ExtensionMethods.handleException(e);
             }
+
             File config = new File(dir.getAbsolutePath() + "/config.yml");
-            if (!config.exists()) {
-                try {
-                    Master.log("Writing default wrapper config for wrapper " + path);
-                    config.createNewFile();
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(config));
-                    String startScript = "type: 1\nserverID: " + path;
-                    writer.write(startScript);
-                    writer.flush();
-                    writer.close();
-                    config.setExecutable(true);
-                } catch (IOException e) {
-                    Main.handleException(e);
-                }
+
+            try {
+                Master.log("Writing default config for wrapper " + path);
+                config.createNewFile();
+                BufferedWriter writer = new BufferedWriter(new FileWriter(config));
+                String cfgContent = "type: 1";
+                writer.write(cfgContent);
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                ExtensionMethods.handleException(e);
             }
+            File wConfig = new File(dir.getAbsolutePath() + "/wrapper.yml");
+
+            try {
+                Master.log("Writing default wConfig for wrapper " + path);
+                config.createNewFile();
+//                BufferedWriter writer = new BufferedWriter(new FileWriter(config));
+//                String wConfigContent =
+//                        "serverID: " + path + "\n" +
+//                                "serverType: " + this.getType() + "\n" +
+//                                "plugins: " + "\n" +
+//                                "serverJar: \n" +
+//                                "\n";
+//                writer.write(wConfigContent);
+                new ObjectMapper(new YAMLFactory()).writeValue(wConfig, getwConfig());
+//                writer.flush();
+//                writer.close();
+            } catch (IOException e) {
+                ExtensionMethods.handleException(e);
+            }
+
             Master.log("Starting wrapper " + path);
             process = Runtime.getRuntime().exec("sh " + path + "/start.sh");
             logger = new Thread(() -> {
@@ -170,9 +173,10 @@ public class WrapperInstance {
      *
      * @param client The MqttClient which should be used for sending instructions
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     public void stop(MqttClient client) {
         try {
-            Main.mqttMsgSend(path, "stop wrapper", client);
+            ExtensionMethods.mqttMsgSend(path, "stop wrapper", client);
             Master.log("Waiting for wrapper " + path + " to stop");
             while (process.isAlive()) {
             }
