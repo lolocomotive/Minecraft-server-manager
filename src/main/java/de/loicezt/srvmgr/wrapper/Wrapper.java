@@ -49,7 +49,7 @@ public class Wrapper {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    System.out.println("stonks" + topic + new String(message.getPayload(), StandardCharsets.UTF_8));
+                    System.out.println("topic message " + topic + new String(message.getPayload(), StandardCharsets.UTF_8));
                     String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                     String[] args = payload.split(" ");
                     switch (args[0]) {
@@ -81,7 +81,7 @@ public class Wrapper {
                                     System.out.println("Preparing server...");
                                     new File("server/mods").mkdirs();
                                     new File("server/plugins").mkdirs();
-                                    File srvDir = new File(".");
+                                    File srvDir = new File("server");
                                     try {
                                         System.out.println("Copying plugins...");
                                         for (String url : config.getPlugins()) {
@@ -146,7 +146,6 @@ public class Wrapper {
                         default:
                     }
                 }
-
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {//Called when a outgoing publish is complete
                 }
