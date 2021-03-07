@@ -52,26 +52,25 @@ public class Master {
                                 for (WrapperInstance wi : Main.config.getServers()) {
                                     wi.stop(client);
                                 }
-                                log("Unsubscribing...");
+                                logger.info("Unsubscribing...");
                                 try {
                                     client.unsubscribe("master");
-                                    log("Disconnecting...");
+                                    logger.info("Disconnecting...");
                                     client.disconnect();
-                                    log("Closing connection...");
+                                    logger.info("Closing connection...");
                                     client.close();
                                 } catch (MqttException e) {
                                     e.printStackTrace();
                                 }
                                 File[] garbage = ExtensionMethods.getGarbage();
                                 if (garbage.length > 0) {
-                                    log("Cleaning up leftover garbage");
+                                    logger.info("Cleaning up leftover garbage");
                                     ExtensionMethods.cleanup(garbage);
                                 }
-                                log("Good bye !");
                             }).start();
                             break;
                         default:
-                            logErr("Unrecognized instruction \"" + payload + "\"");
+                            logger.severe("Unrecognized instruction \"" + payload + "\"");
                     }
                 }
 
@@ -86,45 +85,4 @@ public class Master {
         }
     }
 
-    /**
-     * Custom logging solution, prints a message with the current timestamp
-     *
-     * @param message The message you want to log
-     */
-    public static void log(String message) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println("[" + timestamp + "]\t[INFO]\t[master]:\t" + message);
-    }
-
-    /**
-     * Custom logging solution, prints a message with the current timestamp and origin
-     *
-     * @param message The message you want to log
-     * @param user    The origin of the message
-     */
-    public static void log(String message, String user) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println("[" + timestamp + "]\t[INFO]\t[" + user + "]:\t" + message);
-    }
-
-    /**
-     * Custom logging solution, prints an error message on System.err with the current timestamp
-     *
-     * @param message The error message you want to log
-     */
-    public static void logErr(String message) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.err.println("[" + timestamp + "]\t[ERROR]\t[master]:\t" + message);
-    }
-
-    /**
-     * Custom logging solution, prints an error message on System.err with the current timestamp and origin
-     *
-     * @param message The message you want to log
-     * @param user    The origin of the message
-     */
-    public static void logErr(String message, String user) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.err.println("[" + timestamp + "]\t[ERROR]\t[" + user + "]:\t" + message);
-    }
 }
