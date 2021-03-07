@@ -54,9 +54,9 @@ public class Master {
                             logger.info("stopping");
                             stop = true;
                             new Thread(() -> {
-                                logger.info("Stopping children...");
-                                for (WrapperInstance wi : Main.config.getServers()) {
-                                    wi.stop(client);
+                                logger.fine("Stopping children...");
+                                for (WrapperController wc : Main.config.getServers()) {
+                                    wc.stop(client);
                                 }
                                 logger.info("Unsubscribing...");
                                 try {

@@ -10,7 +10,7 @@ public class ConfigurationHolder {
     private int type;
     private String java;
     private String jarfile;
-    private List<WrapperInstance> servers = new ArrayList<>();
+    private List<WrapperController> servers = new ArrayList<>();
 
     /**
      * Get the Java executable to use to start the wrapper and the minecraft server
@@ -51,18 +51,18 @@ public class ConfigurationHolder {
     /**
      * Get the servers that the server manager is managing
      *
-     * @return A {@link List List}<{@link WrapperInstance WrapperInstance}> containing all the servers that the server manager is managing
+     * @return A {@link List List}<{@link WrapperController WrapperInstance}> containing all the servers that the server manager is managing
      */
-    public List<WrapperInstance> getServers() {
+    public List<WrapperController> getServers() {
         return servers;
     }
 
     /**
      * Sets the servers that the server manager is managing
      *
-     * @param servers A {@link List List}<{@link WrapperInstance WrapperInstance}>  containing all the servers that the server manager is managing
+     * @param servers A {@link List List}<{@link WrapperController WrapperInstance}>  containing all the servers that the server manager is managing
      */
-    public void setServers(List<WrapperInstance> servers) {
+    public void setServers(List<WrapperController> servers) {
         this.servers = servers;
     }
 
