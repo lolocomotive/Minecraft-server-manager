@@ -8,10 +8,8 @@ import de.loicezt.srvmgr.ServerType;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
@@ -117,31 +115,12 @@ public class Wrapper {
                                         logger.info("Didn't find any additional files to copy");
                                     }
                                     ExtensionMethods.copyFile(new File(config.getServerJar()), new File("server/server.jar"));
-                                    System.out.println("starting server...");
-                                    Process p = Runtime.getRuntime().exec("./server/start.sh");
-                                    System.out.println("Started");
-                                    Thread logger = new Thread(() -> {
-                                        try {
-                                            System.out.println("Initializing server logging");
-                                            BufferedReader stdInput = new BufferedReader(new
-                                                    InputStreamReader(p.getInputStream()));
-                                            BufferedReader stdError = new BufferedReader(new
-                                                    InputStreamReader(p.getErrorStream()));
-                                            String in = null, err = null;
-                                            while (p.isAlive() || ((in = stdInput.readLine()) != null) || ((err = stdError.readLine()) != null)) {
-                                                if (in != null)
-                                                    System.out.println("[server]: " + in);
-                                                if (err != null)
-                                                    System.err.println("[server]: " + err);
-                                            }
-                                            stdInput.close();
-                                            stdError.close();
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                        System.out.println("Server logging terminated");
-                                    });
-                                    logger.start();
+                                    logger.info("starting server...");
+                                    ProcessBuilder pb = new ProcessBuilder("sh", "start.sh");
+                                    pb.directory(new File("server"));
+                                    pb.inheritIO();
+                                    pb.start();
+                                    logger.info("Started");
                                 }
                             }
                             break;

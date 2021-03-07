@@ -88,8 +88,7 @@ public class WrapperInstance {
                 startupScript.createNewFile();
                 BufferedWriter writer = new BufferedWriter(new FileWriter(startupScript));
                 String startScript = "#!/bin/sh\n" +
-                        "cd ./" + path + "\n" +
-                        Main.config.getJava() + " -jar wrapper.jar #>> log.txt";
+                        Main.config.getJava() + " -jar wrapper.jar";
                 writer.write(startScript);
                 writer.flush();
                 writer.close();
@@ -121,30 +120,11 @@ public class WrapperInstance {
                 ExtensionMethods.handleException(e);
             }
 
-            Master.log("Starting wrapper " + path);
-            process = Runtime.getRuntime().exec("sh " + path + "/start.sh");
-            logger = new Thread(() -> {
-                try {
-                    Master.log("Initializing logging", path);
-                    BufferedReader stdInput = new BufferedReader(new
-                            InputStreamReader(process.getInputStream()));
-                    BufferedReader stdError = new BufferedReader(new
-                            InputStreamReader(process.getErrorStream()));
-                    String in = null, err = null;
-                    while (process.isAlive() || ((in = stdInput.readLine()) != null) || ((err = stdError.readLine()) != null)) {
-                        if (in != null)
-                            Master.log(in, path);
-                        if (err != null)
-                            Master.logErr(err, path);
-                    }
-                    stdInput.close();
-                    stdError.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Master.log("Logging terminated", path);
-            });
-            logger.start();
+            logger.info("Starting wrapper " + path);
+            ProcessBuilder pb = new ProcessBuilder("sh","start.sh");
+            pb.directory(new File(path));
+            pb.inheritIO();
+            process = pb.start();
         } catch (IOException ex) {
             logger.severe("Error processing server at path " + path);
             ex.printStackTrace();
