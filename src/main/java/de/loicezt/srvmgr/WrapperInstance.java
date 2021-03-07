@@ -116,17 +116,7 @@ public class WrapperInstance {
             try {
                 logger.info("Writing default wConfig for wrapper " + path);
                 config.createNewFile();
-//                BufferedWriter writer = new BufferedWriter(new FileWriter(config));
-//                String wConfigContent =
-//                        "serverID: " + path + "\n" +
-//                                "serverType: " + this.getType() + "\n" +
-//                                "plugins: " + "\n" +
-//                                "serverJar: \n" +
-//                                "\n";
-//                writer.write(wConfigContent);
                 new ObjectMapper(new YAMLFactory()).writeValue(wConfig, getwConfig());
-//                writer.flush();
-//                writer.close();
             } catch (IOException e) {
                 ExtensionMethods.handleException(e);
             }
