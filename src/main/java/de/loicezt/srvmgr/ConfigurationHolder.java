@@ -2,6 +2,7 @@ package de.loicezt.srvmgr;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * The class that holds all of the configuration information read at the beginning of the Main class
@@ -10,6 +11,7 @@ public class ConfigurationHolder {
     private int type;
     private String java;
     private String jarfile;
+    private String logLevel;
     private List<WrapperController> servers = new ArrayList<>();
 
     /**
@@ -84,4 +86,19 @@ public class ConfigurationHolder {
         this.type = type;
     }
 
+    /**
+     * Get the {@link Level log level} of the program (will apply to wrappers too)
+     * @return the log level
+     */
+    public String getLogLevel() {
+        return logLevel;
+    }
+
+    /**
+     * Sets the {@link Level log level} of the program (will apply to wrappers too)
+     * @param logLevel the log level
+     */
+    public void setLogLevel(String logLevel) {
+        this.logLevel = logLevel;
+    }
 }

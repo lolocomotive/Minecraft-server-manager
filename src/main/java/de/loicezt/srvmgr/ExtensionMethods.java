@@ -139,6 +139,7 @@ public class ExtensionMethods {
      */
     static public void setupLogging(Logger logger) throws IOException {
 
+
         // suppress the logging output to the console
         Logger rootLogger = Logger.getLogger("");
         Handler[] handlers = rootLogger.getHandlers();
@@ -152,8 +153,13 @@ public class ExtensionMethods {
         new File("logs").mkdir();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Handler logConsole = new de.loicezt.srvmgr.logging.ConsoleHandler();
+
         Handler fileTxt = new FileHandler("logs/" + timestamp + ".log");
         Handler fileHTML = new FileHandler("logs/" + timestamp + ".html");
+
+        Level level = Level.parse(Main.config.getLogLevel());
+        logger.setLevel(level);
+        logConsole.setLevel(level);
 
         Formatter formatterTxt = new CustomFormatter();
         Formatter formatterHTML = new HTMLFormatter();
@@ -166,6 +172,6 @@ public class ExtensionMethods {
         logger.addHandler(fileHTML);
         logger.addHandler(logConsole);
 
-        logger.setLevel(Level.ALL);
+
     }
 }

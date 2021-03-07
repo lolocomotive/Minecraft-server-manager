@@ -40,11 +40,6 @@ public class Main {
      */
     public static void main(String[] args) {
         Logger logger = Logger.getLogger("Main");
-        try {
-            ExtensionMethods.setupLogging(logger);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         File[] garbage = ExtensionMethods.getGarbage();
         if (garbage.length > 0) {
             logger.info("Cleaning up previous session");
@@ -67,6 +62,12 @@ public class Main {
         }
         try {
             config = mapper.readValue(configFile, ConfigurationHolder.class);
+            try {
+                ExtensionMethods.setupLogging(logger);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             if (config.getType() == WRAPPER) {
                 new Wrapper();
             } else if (config.getType() == MASTER) {
