@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * The main class
@@ -38,18 +39,23 @@ public class Main {
      *             <p>It will instantiate a {@link Wrapper} or {@link Master} class depending on the configuration (0 = Master, 1 = Wrapper)</p>
      */
     public static void main(String[] args) {
-
+        Logger logger = Logger.getLogger("Main");
+        try {
+            ExtensionMethods.setupLogging(logger);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         File[] garbage = ExtensionMethods.getGarbage();
         if (garbage.length > 0) {
-            System.out.println("Cleaning up previous session");
+            logger.info("Cleaning up previous session");
             ExtensionMethods.cleanup(garbage);
         }
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         File configFile = new File(configURL);
         if (!configFile.exists()) {
             try {
-                System.out.println("First run detected - Welcome !");
-                System.out.println("Writing default config file");
+                logger.info("First run detected - Welcome !");
+                logger.info("Writing default config file");
                 configFile.createNewFile();
                 BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
                 writer.write(defaultConfiguration);
@@ -71,5 +77,4 @@ public class Main {
             ExtensionMethods.handleException(e);
         }
     }
-
 }

@@ -88,8 +88,9 @@ public class WrapperController {
             File thisJar = new File("./" + Main.config.getJarfile());
             ExtensionMethods.copyFile(thisJar, new File(dir.getAbsolutePath() + "/wrapper.jar"));
             File startupScript = new File(dir.getAbsolutePath() + "/start.sh");
+            logger.info("Preparing wrapper for start...");
             try {
-                logger.info("Writing default startup script for wrapper " + path);
+                logger.fine("Writing default startup script for wrapper " + path);
                 startupScript.createNewFile();
                 BufferedWriter writer = new BufferedWriter(new FileWriter(startupScript));
                 String startScript = "#!/bin/sh\n" +
@@ -105,7 +106,7 @@ public class WrapperController {
             File config = new File(dir.getAbsolutePath() + "/config.yml");
 
             try {
-                logger.info("Writing default config for wrapper " + path);
+                logger.fine("Writing default config for wrapper " + path);
                 config.createNewFile();
                 BufferedWriter writer = new BufferedWriter(new FileWriter(config));
                 String cfgContent = "type: 1";
@@ -118,7 +119,7 @@ public class WrapperController {
             File wConfig = new File(dir.getAbsolutePath() + "/wrapper.yml");
 
             try {
-                logger.info("Writing default wConfig for wrapper " + path);
+                logger.fine("Writing default wConfig for wrapper " + path);
                 config.createNewFile();
                 new ObjectMapper(new YAMLFactory()).writeValue(wConfig, getwConfig());
             } catch (IOException e) {

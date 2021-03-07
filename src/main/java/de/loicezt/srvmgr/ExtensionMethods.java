@@ -151,10 +151,9 @@ public class ExtensionMethods {
         }
         new File("logs").mkdir();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        Handler logConsole = new ConsoleHandler();
+        Handler logConsole = new de.loicezt.srvmgr.logging.ConsoleHandler();
         Handler fileTxt = new FileHandler("logs/" + timestamp + ".log");
         Handler fileHTML = new FileHandler("logs/" + timestamp + ".html");
-
 
         Formatter formatterTxt = new CustomFormatter();
         Formatter formatterHTML = new HTMLFormatter();
@@ -166,5 +165,7 @@ public class ExtensionMethods {
         logger.addHandler(fileTxt);
         logger.addHandler(fileHTML);
         logger.addHandler(logConsole);
+
+        logger.setLevel(Level.ALL);
     }
 }

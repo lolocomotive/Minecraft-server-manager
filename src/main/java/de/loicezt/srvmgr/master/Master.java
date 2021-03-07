@@ -2,7 +2,7 @@ package de.loicezt.srvmgr.master;
 
 import de.loicezt.srvmgr.ExtensionMethods;
 import de.loicezt.srvmgr.Main;
-import de.loicezt.srvmgr.WrapperInstance;
+import de.loicezt.srvmgr.WrapperController;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
@@ -19,13 +19,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class Master {
     boolean stop = false;
     MqttClient client;
-    Logger logger = Logger.getLogger(Master.class.getName());
+    Logger logger;
+
 
     /**
      * The constructor
      * Connects to the localhost MQTT server and starts all of the children (Which will then start up as {@link de.loicezt.srvmgr.wrapper.Wrapper Wrappers})
      */
     public Master() {
+        logger = Logger.getLogger("Master");
         try {
             ExtensionMethods.setupLogging(logger);
         } catch (IOException e) {
@@ -37,8 +39,8 @@ public class Master {
             client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId(), new MemoryPersistence());
             client.connect();
             ExtensionMethods.mqttMsgSend("log", "Master node started", client);
-            for (WrapperInstance instance : Main.config.getServers()) {
-                instance.startWrapper();
+            for (WrapperController controller : Main.config.getServers()) {
+                controller.startWrapper();
             }
             client.setCallback(new MqttCallback() {
                 @Override
@@ -47,23 +49,23 @@ public class Master {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    System.out.println(topic + ": " + new String(message.getPayload(), UTF_8));
+                    logger.finer(topic + ": " + new String(message.getPayload(), UTF_8));
                     String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                     switch (payload) {
                         case "stop master":
-                            logger.info("stopping");
+                            logger.info("Stopping master");
                             stop = true;
                             new Thread(() -> {
                                 logger.fine("Stopping children...");
                                 for (WrapperController wc : Main.config.getServers()) {
                                     wc.stop(client);
                                 }
-                                logger.info("Unsubscribing...");
+                                logger.fine("Unsubscribing...");
                                 try {
                                     client.unsubscribe("master");
-                                    logger.info("Disconnecting...");
+                                    logger.fine("Disconnecting...");
                                     client.disconnect();
-                                    logger.info("Closing connection...");
+                                    logger.fine("Closing connection...");
                                     client.close();
                                 } catch (MqttException e) {
                                     e.printStackTrace();
@@ -73,6 +75,7 @@ public class Master {
                                     logger.info("Cleaning up leftover garbage");
                                     ExtensionMethods.cleanup(garbage);
                                 }
+                                logger.info("Finished execution, good bye !");
                             }).start();
                             break;
                         default:

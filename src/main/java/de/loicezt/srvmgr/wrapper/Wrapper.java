@@ -21,25 +21,28 @@ import java.util.logging.Logger;
 public class Wrapper {
     private static final String wrapperConfigFile = "./wrapper.yml";
     private WrapperConfigurationHolder config;
-    private Logger logger = Logger.getLogger(Wrapper.class.getName());
+    private Logger logger;
 
     /**
      * The constructor <p>Connects to the localhost MQTT server and sets itself up to listen for instructions</p>
      */
     public Wrapper() {
-        try {
-            ExtensionMethods.setupLogging(logger);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        logger.info("Starting up as WRAPPER node");
+
+        System.out.println("Starting up...");
         try {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             config = mapper.readValue(new File(wrapperConfigFile), WrapperConfigurationHolder.class);
+
         } catch (JsonProcessingException e) {
             logger.severe("Something went wrong while reading the configuration file, stopping immediately");
             e.printStackTrace();
             System.exit(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger = Logger.getLogger("Wrapper @"+config.getServerID());
+        try {
+            ExtensionMethods.setupLogging(logger);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,7 +57,7 @@ public class Wrapper {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    logger.info("topic message " + topic + new String(message.getPayload(), StandardCharsets.UTF_8));
+                    logger.finer("topic message " + topic +" "+ new String(message.getPayload(), StandardCharsets.UTF_8));
                     String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                     String[] args = payload.split(" ");
                     switch (args[0]) {
@@ -64,13 +67,14 @@ public class Wrapper {
                                     logger.info("Stopping wrapper !");
                                     try {
                                         client.publish(config.getServerID(), new MqttMessage("wrapper stopping".getBytes(StandardCharsets.UTF_8)));
-                                        logger.info("Unsubscribing from topic");
+                                        logger.fine("Unsubscribing from topic");
                                         client.unsubscribe(config.getServerID());
-                                        logger.info("Disconnecting Mqtt client");
+                                        logger.fine("Disconnecting Mqtt client");
                                         client.disconnect();
-                                        logger.info("Closing connection");
+                                        logger.fine("Closing connection");
                                         client.close();
-                                        logger.info("Connection closed");
+                                        logger.fine("Connection closed");
+                                        logger.info("Finished execution");
                                         System.exit(0);
                                     } catch (MqttException e) {
                                         e.printStackTrace();
@@ -91,41 +95,41 @@ public class Wrapper {
                                         logger.info("Copying plugins...");
                                         for (String url : config.getPlugins()) {
                                             File f = new File(url);
-                                            logger.info(f.getName());
+                                            logger.fine(f.getName());
                                             ExtensionMethods.copyFile(f, new File("server/plugins/" + f.getName()));
                                         }
                                     } catch (NullPointerException e) {
-                                        logger.info("Didn't find any plugin to copy");
+                                        logger.fine("Didn't find any plugin to copy");
                                     }
                                     try {
                                         logger.info("Copying mods...");
 
                                         for (String url : config.getMods()) {
                                             File f = new File(url);
-                                            logger.info(f.getName());
+                                            logger.fine(f.getName());
                                             ExtensionMethods.copyFile(f, new File("server/mods/" + f.getName()));
                                         }
                                     } catch (NullPointerException e) {
-                                        logger.info("Didn't find any mods to copy");
+                                        logger.fine("Didn't find any mods to copy");
                                     }
                                     try {
                                         logger.info("Copying Additional server files...");
 
                                         for (String url : config.getAdditionalFiles()) {
                                             File f = new File(url);
-                                            logger.info(f.getName());
+                                            logger.fine(f.getName());
                                             ExtensionMethods.copyFile(f, new File("server/" + f.getName()));
                                         }
                                     } catch (NullPointerException e) {
-                                        logger.info("Didn't find any additional files to copy");
+                                        logger.fine("Didn't find any additional files to copy");
                                     }
                                     ExtensionMethods.copyFile(new File(config.getServerJar()), new File("server/server.jar"));
-                                    logger.info("starting server...");
+                                    logger.info("Starting server...");
                                     ProcessBuilder pb = new ProcessBuilder("sh", "start.sh");
                                     pb.directory(new File("server"));
                                     pb.inheritIO();
                                     pb.start();
-                                    logger.info("Started");
+                                    logger.fine("Started");
                                 }
                             }
                             break;
