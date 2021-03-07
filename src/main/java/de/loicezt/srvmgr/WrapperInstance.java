@@ -9,6 +9,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 /**
  * The class that allows communication between the {@link Master Master} and {@link Wrapper Wrapper} nodes
@@ -19,17 +20,9 @@ public class WrapperInstance {
     private Status status;
     private Status srvStatus;
     private Process process;
-    private Thread logger;
     private ServerType type;
     private WrapperConfigurationHolder wConfig;
-
-    public Thread getLogger() {
-        return logger;
-    }
-
-    public void setLogger(Thread logger) {
-        this.logger = logger;
-    }
+    private Logger logger = Logger.getLogger(WrapperInstance.class.getName());
 
     public WrapperConfigurationHolder getwConfig() {
         return wConfig;
@@ -91,7 +84,7 @@ public class WrapperInstance {
             ExtensionMethods.copyFile(thisJar, new File(dir.getAbsolutePath() + "/wrapper.jar"));
             File startupScript = new File(dir.getAbsolutePath() + "/start.sh");
             try {
-                Master.log("Writing default startup script for wrapper " + path);
+                logger.info("Writing default startup script for wrapper " + path);
                 startupScript.createNewFile();
                 BufferedWriter writer = new BufferedWriter(new FileWriter(startupScript));
                 String startScript = "#!/bin/sh\n" +
@@ -108,7 +101,7 @@ public class WrapperInstance {
             File config = new File(dir.getAbsolutePath() + "/config.yml");
 
             try {
-                Master.log("Writing default config for wrapper " + path);
+                logger.info("Writing default config for wrapper " + path);
                 config.createNewFile();
                 BufferedWriter writer = new BufferedWriter(new FileWriter(config));
                 String cfgContent = "type: 1";
@@ -121,7 +114,7 @@ public class WrapperInstance {
             File wConfig = new File(dir.getAbsolutePath() + "/wrapper.yml");
 
             try {
-                Master.log("Writing default wConfig for wrapper " + path);
+                logger.info("Writing default wConfig for wrapper " + path);
                 config.createNewFile();
 //                BufferedWriter writer = new BufferedWriter(new FileWriter(config));
 //                String wConfigContent =
@@ -163,7 +156,7 @@ public class WrapperInstance {
             });
             logger.start();
         } catch (IOException ex) {
-            Master.logErr("Error processing server at path " + path);
+            logger.severe("Error processing server at path " + path);
             ex.printStackTrace();
         }
     }
@@ -177,7 +170,7 @@ public class WrapperInstance {
     public void stop(MqttClient client) {
         try {
             ExtensionMethods.mqttMsgSend(path, "stop wrapper", client);
-            Master.log("Waiting for wrapper " + path + " to stop");
+            logger.info("Waiting for wrapper " + path + " to stop");
             while (process.isAlive()) {
             }
             client.unsubscribe(path);

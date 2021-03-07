@@ -10,8 +10,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static de.loicezt.srvmgr.master.Master.logErr;
-
 /**
  * The main class
  */

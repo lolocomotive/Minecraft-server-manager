@@ -8,7 +8,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
+import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -18,14 +18,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class Master {
     boolean stop = false;
     MqttClient client;
+    Logger logger = Logger.getLogger(Master.class.getName());
 
     /**
      * The constructor
      * Connects to the localhost MQTT server and starts all of the children (Which will then start up as {@link de.loicezt.srvmgr.wrapper.Wrapper Wrappers})
      */
     public Master() {
-        log("Starting up as MASTER node");
-
+        logger.info("Starting up as MASTER node");
+        logger.config("config");
         try {
             MqttClient client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId(), new MemoryPersistence());
             client.connect();
@@ -44,10 +45,10 @@ public class Master {
                     String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                     switch (payload) {
                         case "stop master":
-                            log("stopping");
+                            logger.info("stopping");
                             stop = true;
                             new Thread(() -> {
-                                log("Stopping children...");
+                                logger.info("Stopping children...");
                                 for (WrapperInstance wi : Main.config.getServers()) {
                                     wi.stop(client);
                                 }

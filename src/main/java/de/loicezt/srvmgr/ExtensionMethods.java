@@ -1,5 +1,7 @@
 package de.loicezt.srvmgr;
 
+import de.loicezt.srvmgr.logging.CustomFormatter;
+import de.loicezt.srvmgr.logging.HTMLFormatter;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -8,16 +10,17 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import static de.loicezt.srvmgr.master.Master.logErr;
+import java.util.logging.*;
 
 /**
  * Contains methods to copy, recursively delete files, or to log stuff
  */
 public class ExtensionMethods {
+    private static Logger logger = Logger.getLogger(ExtensionMethods.class.getName());
 
     /**
      * Copy a file
@@ -46,8 +49,8 @@ public class ExtensionMethods {
      * @param e The exception that occurred
      */
     public static void handleException(Exception e) {
-        logErr("An error occurred!");
-        logErr(e.getLocalizedMessage());
+        logger.severe("An error occurred!");
+        logger.severe(e.getLocalizedMessage());
         System.exit(1);
     }
 
@@ -117,5 +120,39 @@ public class ExtensionMethods {
                 .map(Path::toFile)
                 .forEach(File::delete);
         return !dir.toFile().exists();
+    }
+
+    /**
+     * Sets up the logger to format the console output correctly and log as Txt and HTML to files
+     *
+     * @param logger the logger to be set up
+     * @throws IOException If the log files couldn't be created / written to
+     */
+    static public void setupLogging(Logger logger) throws IOException {
+
+
+        // suppress the logging output to the console
+        Logger rootLogger = Logger.getLogger("");
+        Handler[] handlers = rootLogger.getHandlers();
+        if (handlers[0] instanceof ConsoleHandler) {
+            rootLogger.removeHandler(handlers[0]);
+        }
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        Handler logConsole = new ConsoleHandler();
+        Handler fileTxt = new FileHandler("logs/" + timestamp + ".log");
+        Handler fileHTML = new FileHandler("logs/" + timestamp + ".html");
+
+        new File("logs").mkdir();
+
+        Formatter formatterTxt = new CustomFormatter();
+        Formatter formatterHTML = new HTMLFormatter();
+
+        logConsole.setFormatter(formatterTxt);
+        fileTxt.setFormatter(formatterTxt);
+        fileHTML.setFormatter(formatterHTML);
+
+        logger.addHandler(fileTxt);
+        logger.addHandler(fileHTML);
+        logger.addHandler(logConsole);
     }
 }
