@@ -30,7 +30,7 @@ public class ExtensionMethods {
      * @throws IOException If the copy fails
      */
     public static void copyFile(File from, File to) throws IOException {
-        if(!from.exists()) throw new IOException();
+        if (!from.exists()) throw new IOException();
         try (InputStream in = new BufferedInputStream(new FileInputStream(from));
              OutputStream out = new BufferedOutputStream(new FileOutputStream(to))) {
 
