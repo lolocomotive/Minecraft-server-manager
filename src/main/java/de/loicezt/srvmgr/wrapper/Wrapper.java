@@ -27,6 +27,11 @@ public class Wrapper {
      * The constructor <p>Connects to the localhost MQTT server and sets itself up to listen for instructions</p>
      */
     public Wrapper() {
+        try {
+            ExtensionMethods.setupLogging(logger);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.info("Starting up as WRAPPER node");
         try {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());

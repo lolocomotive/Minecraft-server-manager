@@ -20,7 +20,16 @@ import java.util.logging.*;
  * Contains methods to copy, recursively delete files, or to log stuff
  */
 public class ExtensionMethods {
+
     private static Logger logger = Logger.getLogger(ExtensionMethods.class.getName());
+
+    {
+        try {
+            setupLogging(logger);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Copy a file
@@ -130,19 +139,22 @@ public class ExtensionMethods {
      */
     static public void setupLogging(Logger logger) throws IOException {
 
-
         // suppress the logging output to the console
         Logger rootLogger = Logger.getLogger("");
         Handler[] handlers = rootLogger.getHandlers();
-        if (handlers[0] instanceof ConsoleHandler) {
-            rootLogger.removeHandler(handlers[0]);
+        try {
+            if (handlers[0] instanceof ConsoleHandler) {
+                rootLogger.removeHandler(handlers[0]);
+            }
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+
         }
+        new File("logs").mkdir();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Handler logConsole = new ConsoleHandler();
         Handler fileTxt = new FileHandler("logs/" + timestamp + ".log");
         Handler fileHTML = new FileHandler("logs/" + timestamp + ".html");
 
-        new File("logs").mkdir();
 
         Formatter formatterTxt = new CustomFormatter();
         Formatter formatterHTML = new HTMLFormatter();

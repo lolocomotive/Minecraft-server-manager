@@ -78,6 +78,11 @@ public class WrapperInstance {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void startWrapper() {
         try {
+            ExtensionMethods.setupLogging(logger);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
             File dir = new File("./" + path);
             dir.mkdirs();
             File thisJar = new File("./" + Main.config.getJarfile());

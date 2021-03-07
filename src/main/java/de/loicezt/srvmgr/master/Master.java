@@ -7,6 +7,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
@@ -25,6 +26,11 @@ public class Master {
      * Connects to the localhost MQTT server and starts all of the children (Which will then start up as {@link de.loicezt.srvmgr.wrapper.Wrapper Wrappers})
      */
     public Master() {
+        try {
+            ExtensionMethods.setupLogging(logger);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.info("Starting up as MASTER node");
         logger.config("config");
         try {
