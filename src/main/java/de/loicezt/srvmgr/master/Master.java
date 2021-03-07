@@ -28,7 +28,7 @@ public class Master {
         logger.info("Starting up as MASTER node");
         logger.config("config");
         try {
-            MqttClient client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId(), new MemoryPersistence());
+            client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId(), new MemoryPersistence());
             client.connect();
             ExtensionMethods.mqttMsgSend("log", "Master node started", client);
             for (WrapperInstance instance : Main.config.getServers()) {
