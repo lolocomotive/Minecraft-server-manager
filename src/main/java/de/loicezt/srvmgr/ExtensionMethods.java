@@ -33,9 +33,8 @@ public class ExtensionMethods {
 
     /**
      * Copy a file
-     *
-     * @param from The source file
-     * @param to   The destination File
+     * @param from the source file
+     * @param to the destination file
      * @throws IOException If the copy fails
      */
     public static void copyFile(File from, File to) throws IOException {
@@ -69,7 +68,7 @@ public class ExtensionMethods {
      * @param topic   The MQTT topic
      * @param message The message to send
      * @param client  The MQTT client
-     * @throws MqttException
+     * @throws MqttException If the message fails to send
      */
     public static void mqttMsgSend(String topic, String message, MqttClient client) throws MqttException {
         MqttMessage m = new MqttMessage(message.getBytes(StandardCharsets.UTF_8));
@@ -121,7 +120,7 @@ public class ExtensionMethods {
      *
      * @param dir The directory to be deleted
      * @return Whether the deletion was successful or not
-     * @throws IOException
+     * @throws IOException If the deletion fails
      */
     public static boolean deleteDirectory(Path dir) throws IOException {
         Files.walk(dir)
