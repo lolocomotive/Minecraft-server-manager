@@ -53,7 +53,7 @@ public class ConfigurationHolder {
     /**
      * Get the servers that the server manager is managing
      *
-     * @return A {@link List List}<{@link WrapperController WrapperInstance}> containing all the servers that the server manager is managing
+     * @return A {@link List List}&lt;{@link WrapperController WrapperInstance}&gt; containing all the servers that the server manager is managing
      */
     public List<WrapperController> getServers() {
         return servers;
@@ -62,7 +62,7 @@ public class ConfigurationHolder {
     /**
      * Sets the servers that the server manager is managing
      *
-     * @param servers A {@link List List}<{@link WrapperController WrapperInstance}>  containing all the servers that the server manager is managing
+     * @param servers A {@link List List}&lt;{@link WrapperController WrapperInstance}&gt;  containing all the servers that the server manager is managing
      */
     public void setServers(List<WrapperController> servers) {
         this.servers = servers;
