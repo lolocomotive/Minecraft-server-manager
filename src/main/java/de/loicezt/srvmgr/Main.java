@@ -51,7 +51,10 @@ public class Main {
             try {
                 logger.info("First run detected - Welcome !");
                 logger.info("Writing default config file");
-                configFile.createNewFile();
+                if(!configFile.createNewFile()){
+                    logger.severe("Couldn't create the configuration file");
+                    System.exit(1);
+                }
                 BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
                 writer.write(defaultConfiguration);
                 writer.flush();

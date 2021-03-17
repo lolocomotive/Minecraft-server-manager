@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 /**
  * The class that allows communication between the {@link Master Master} and {@link Wrapper Wrapper} nodes
  */
+@SuppressWarnings({"unused"})
 public class WrapperController {
 
     private String path;
@@ -22,7 +23,7 @@ public class WrapperController {
     private Process process;
     private ServerType type;
     private WrapperConfigurationHolder wConfig;
-    private Logger logger = Logger.getLogger("Wrapper controller");
+    private final Logger logger = Logger.getLogger("Wrapper controller");
 
     public WrapperConfigurationHolder getwConfig() {
         return wConfig;

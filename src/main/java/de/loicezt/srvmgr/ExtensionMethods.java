@@ -21,9 +21,9 @@ import java.util.logging.*;
  */
 public class ExtensionMethods {
 
-    private static Logger logger = Logger.getLogger(ExtensionMethods.class.getName());
+    private static final Logger logger = Logger.getLogger(ExtensionMethods.class.getName());
 
-    {
+    static {
         try {
             setupLogging(logger);
         } catch (IOException e) {
@@ -69,7 +69,7 @@ public class ExtensionMethods {
      * @param topic   The MQTT topic
      * @param message The message to send
      * @param client  The MQTT client
-     * @throws MqttException
+     * @throws MqttException if the constructor of MqttMessage throws an MQTT exception
      */
     public static void mqttMsgSend(String topic, String message, MqttClient client) throws MqttException {
         MqttMessage m = new MqttMessage(message.getBytes(StandardCharsets.UTF_8));
@@ -88,7 +88,9 @@ public class ExtensionMethods {
                 if (file.isDirectory()) {
                     deleteDirectory(file.toPath());
                 } else {
-                    file.delete();
+                    if (file.delete()) {
+                        throw new IOException("Couldn't delete file " + file.getName());
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -104,9 +106,11 @@ public class ExtensionMethods {
     public static File[] getGarbage() {
         File[] files = new File(".").listFiles();
         List<File> r = new ArrayList<>();
-        for (File file : files) {
-            if (file.getName().endsWith("1883") || file.getName().startsWith("hs_err_pid")) {
-                r.add(file);
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().endsWith("1883") || file.getName().startsWith("hs_err_pid")) {
+                    r.add(file);
+                }
             }
         }
         File[] re = new File[r.size()];
@@ -121,8 +125,9 @@ public class ExtensionMethods {
      *
      * @param dir The directory to be deleted
      * @return Whether the deletion was successful or not
-     * @throws IOException
+     * @throws IOException If the deletion fails
      */
+    @SuppressWarnings({"all"})
     public static boolean deleteDirectory(Path dir) throws IOException {
         Files.walk(dir)
                 .sorted(Comparator.reverseOrder())
@@ -150,7 +155,9 @@ public class ExtensionMethods {
         } catch (ArrayIndexOutOfBoundsException ignored) {
 
         }
-        new File("logs").mkdir();
+        if (!new File("logs").mkdir()){
+            throw new IOException("Couldn't create logs folder");
+        }
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Handler logConsole = new de.loicezt.srvmgr.logging.ConsoleHandler();
 

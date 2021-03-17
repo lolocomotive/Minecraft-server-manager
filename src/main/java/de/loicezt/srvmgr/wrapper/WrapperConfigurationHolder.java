@@ -3,7 +3,7 @@ package de.loicezt.srvmgr.wrapper;
 import de.loicezt.srvmgr.ServerType;
 
 import java.util.List;
-
+@SuppressWarnings({"Unused"})
 public class WrapperConfigurationHolder {
     private String serverID;
     private ServerType serverType;

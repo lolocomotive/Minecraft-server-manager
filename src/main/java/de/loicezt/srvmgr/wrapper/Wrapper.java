@@ -40,7 +40,7 @@ public class Wrapper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        logger = Logger.getLogger("Wrapper @"+config.getServerID());
+        logger = Logger.getLogger("Wrapper @" + config.getServerID());
         try {
             ExtensionMethods.setupLogging(logger);
         } catch (IOException e) {
@@ -57,7 +57,7 @@ public class Wrapper {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    logger.finer("topic message " + topic +" "+ new String(message.getPayload(), StandardCharsets.UTF_8));
+                    logger.finer("topic message " + topic + " " + new String(message.getPayload(), StandardCharsets.UTF_8));
                     String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                     String[] args = payload.split(" ");
                     switch (args[0]) {
@@ -90,7 +90,7 @@ public class Wrapper {
                                     logger.info("Preparing server...");
                                     new File("server/mods").mkdirs();
                                     new File("server/plugins").mkdirs();
-                                    File srvDir = new File("server");
+
                                     try {
                                         logger.info("Copying plugins...");
                                         for (String url : config.getPlugins()) {

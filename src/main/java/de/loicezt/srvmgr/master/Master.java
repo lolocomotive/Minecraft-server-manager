@@ -48,38 +48,36 @@ public class Master {
                 }
 
                 @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                public void messageArrived(String topic, MqttMessage message){
                     logger.finer(topic + ": " + new String(message.getPayload(), UTF_8));
                     String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
-                    switch (payload) {
-                        case "stop master":
-                            logger.info("Stopping master");
-                            stop = true;
-                            new Thread(() -> {
-                                logger.fine("Stopping children...");
-                                for (WrapperController wc : Main.config.getServers()) {
-                                    wc.stop(client);
-                                }
-                                logger.fine("Unsubscribing...");
-                                try {
-                                    client.unsubscribe("master");
-                                    logger.fine("Disconnecting...");
-                                    client.disconnect();
-                                    logger.fine("Closing connection...");
-                                    client.close();
-                                } catch (MqttException e) {
-                                    e.printStackTrace();
-                                }
-                                File[] garbage = ExtensionMethods.getGarbage();
-                                if (garbage.length > 0) {
-                                    logger.info("Cleaning up leftover garbage");
-                                    ExtensionMethods.cleanup(garbage);
-                                }
-                                logger.info("Finished execution, good bye !");
-                            }).start();
-                            break;
-                        default:
-                            logger.severe("Unrecognized instruction \"" + payload + "\"");
+                    if ("stop master".equals(payload)) {
+                        logger.info("Stopping master");
+                        stop = true;
+                        new Thread(() -> {
+                            logger.fine("Stopping children...");
+                            for (WrapperController wc : Main.config.getServers()) {
+                                wc.stop(client);
+                            }
+                            logger.fine("Unsubscribing...");
+                            try {
+                                client.unsubscribe("master");
+                                logger.fine("Disconnecting...");
+                                client.disconnect();
+                                logger.fine("Closing connection...");
+                                client.close();
+                            } catch (MqttException e) {
+                                e.printStackTrace();
+                            }
+                            File[] garbage = ExtensionMethods.getGarbage();
+                            if (garbage.length > 0) {
+                                logger.info("Cleaning up leftover garbage");
+                                ExtensionMethods.cleanup(garbage);
+                            }
+                            logger.info("Finished execution, good bye !");
+                        }).start();
+                    } else {
+                        logger.severe("Unrecognized instruction \"" + payload + "\"");
                     }
                 }
 

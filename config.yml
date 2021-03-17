@@ -2,6 +2,7 @@
 type: 0
 jarfile: ./target/mcsrvmgr-1.0-SNAPSHOT-jar-with-dependencies.jar
 java: java
+logLevel: FINEST
 servers:
   - path: servers/lobby
     type: MINIGAME
@@ -15,7 +16,7 @@ servers:
       serverJar: /home/stonksic/Downloads/spigot-1.16.5.jar
       plugins:
       serverID: servers/lobby
-  - path: servers/srv01
-    type: MINIGAME
-  - path: servers/survival
-    type: FIXED
+#  - path: servers/srv01
+#    type: MINIGAME
+#  - path: servers/survival
+#    type: FIXED

@@ -7,6 +7,7 @@ import java.util.logging.Level;
 /**
  * The class that holds all of the configuration information read at the beginning of the Main class
  */
+@SuppressWarnings({"unused"})
 public class ConfigurationHolder {
     private int type;
     private String java;

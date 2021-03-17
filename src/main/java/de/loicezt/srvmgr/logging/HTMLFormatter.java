@@ -13,7 +13,7 @@ public class HTMLFormatter extends Formatter {
 
     // this method is called for every log records
     public String format(LogRecord rec) {
-        StringBuffer buf = new StringBuffer(1000);
+        StringBuilder buf = new StringBuilder(1000);
         buf.append("<tr>\n");
 
         // colorize any levels >= WARNING in red
