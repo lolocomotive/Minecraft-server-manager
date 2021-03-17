@@ -69,7 +69,7 @@ public class ExtensionMethods {
      * @param topic   The MQTT topic
      * @param message The message to send
      * @param client  The MQTT client
-     * @throws MqttException if the constructor of MqttMessage throws an MQTT exception
+     * @throws MqttException If the message fails to send
      */
     public static void mqttMsgSend(String topic, String message, MqttClient client) throws MqttException {
         MqttMessage m = new MqttMessage(message.getBytes(StandardCharsets.UTF_8));
